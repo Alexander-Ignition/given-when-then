@@ -48,7 +48,12 @@ final class UserTests: TestCase {
 ```
 ## Сomparison with other approaches
 
-open Tests/ExampleTests/UserTests.swift and run tests
+1. open Tests/ExampleTests/UserTests.swift
+2. run tests
+3. see results in Xcode Report Navigator
+
+- Comments are not visible in the report
+- `XCTContext` is too verbose
 
 ```swift
 import XCTest
@@ -92,6 +97,5 @@ final class UserTests: TestCase {
     }
 }
 ```
-See results in Xcode Report Navigator
 
 ![Xcode Report Navigator](Xcode_Report_Navigator.png)
