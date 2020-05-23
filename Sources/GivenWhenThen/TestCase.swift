@@ -9,27 +9,28 @@ open class TestCase: XCTestCase {
         public let expected: Bool
     }
 
-    public struct Context {
-        public let name: String
-        public var failures: [Failure] = []
-    }
+    private var failures: [Failure] = []
 
-    private var contexts: [Context] = []
-
-    open func context(_ name: String) {
-        contexts.append(Context(name: name))
+    open var context: String? {
+        didSet {
+            guard let context = oldValue else { return }
+            XCTContext.runActivity(named: context) { _ -> Void in
+                failures.forEach(recordFailure)
+            }
+            failures.removeAll(keepingCapacity: true)
+        }
     }
 
     open func given(_ description: String = "") {
-        context("Given: \(description)")
+        context = "Given: \(description)"
     }
 
     open func when(_ description: String = "") {
-        context("When: \(description)")
+        context = "When: \(description)"
     }
 
     open func then(_ description: String = "") {
-        context("Then: \(description)")
+        context = "Then: \(description)"
     }
 
     open func recordFailure(_ record: Failure) {
@@ -43,11 +44,7 @@ open class TestCase: XCTestCase {
     // MARK: - XCTestCase
 
     open override func tearDown() {
-        for context in contexts {
-            XCTContext.runActivity(named: context.name) { _ -> Void in
-                context.failures.forEach(recordFailure)
-            }
-        }
+        context = nil
         super.tearDown()
     }
 
@@ -63,11 +60,10 @@ open class TestCase: XCTestCase {
             lineNumber: lineNumber,
             expected: expected)
 
-        if contexts.isEmpty {
+        if context == nil {
             recordFailure(failure)
         } else {
-            let lastIndex = contexts.index(before: contexts.endIndex)
-            contexts[lastIndex].failures.append(failure)
+            failures.append(failure)
         }
     }
 }
